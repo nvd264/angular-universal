@@ -1,0 +1,6 @@
+<div class="router-container">
+  <a routerLink="/auth/login" *ngIf="!currentUser">Login</a>
+  <a *ngIf="currentUser" href="#" (click)="logout(); $event.preventDefault()">Logout</a>
+  <a routerLink="/profile">Profile</a>
+  <router-outlet></router-outlet>
+</div>
