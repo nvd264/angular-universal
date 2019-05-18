@@ -1,13 +1,11 @@
-import { ROOT } from '@configs/routes/common';
 import { BehaviorSubject } from 'rxjs';
 import { CookieService } from '@gorniv/ngx-universal';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { User } from '@shared/models/User';
-import { AUTH_KEY, AUTH_CURRENT_USER } from '@configs/consts/auth';
+import { AUTH_KEY, AUTH_CURRENT_USER } from '@configs/consts';
 import { Router } from '@angular/router';
-import { PROFILE_ROUTE } from '@configs/routes/profile';
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +54,7 @@ export class AuthService {
     this.http.post(environment.API_URL + environment.AUTH_LOGIN_PATH, formData, options).subscribe({
       next: res => {
         this.setUserData(res);
-        this.router.navigate([PROFILE_ROUTE])
+        this.router.navigate(['/profile'])
       },
       error: err => {
         throw Error(`User not found.`)
@@ -65,9 +63,10 @@ export class AuthService {
   }
 
   logout() {
-    this.cookieService.removeAll();
+    this.cookieService.remove(AUTH_KEY);
+    this.cookieService.remove(AUTH_CURRENT_USER);
     this.currentUserSub$.next(null);
-    this.router.navigate([ROOT])
+    this.router.navigate(['/'])
   }
 
   get isLogin() {
