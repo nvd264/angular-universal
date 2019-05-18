@@ -2,10 +2,10 @@ import { BehaviorSubject } from 'rxjs';
 import { CookieService } from '@gorniv/ngx-universal';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '@environments/environment';
-import { User } from '@shared/models/User';
+import { User } from '@shared/models';
 import { AUTH_KEY, AUTH_CURRENT_USER } from '@configs/consts';
 import { Router } from '@angular/router';
+import { IAuthResponse } from '@shared/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -17,13 +17,13 @@ export class AuthService {
     this.currentUserSub$ = this.getCurrentUserInCookie();
   }
 
-  private setUserData(data: any) {
+  private setUserData(data: IAuthResponse) {
     const currentUser = {
       id: null,
       email: data.email
     } as User;
     // set token into cookies for auth
-    this.cookieService.put(AUTH_KEY, data.access_token);
+    this.cookieService.put(AUTH_KEY, data.token);
     this.cookieService.putObject(AUTH_CURRENT_USER, currentUser)
     // set user info
     // pending...
@@ -51,15 +51,16 @@ export class AuthService {
     const options = {
       headers: headers
     };
-    this.http.post(environment.API_URL + environment.AUTH_LOGIN_PATH, formData, options).subscribe({
-      next: res => {
-        this.setUserData(res);
-        this.router.navigate(['/profile'])
-      },
-      error: err => {
-        throw Error(`User not found.`)
-      }
-    });
+
+    // Fake login
+    setTimeout(() => {
+      this.setUserData({
+        token: 'demo-token',
+        email: username
+      });
+
+      this.router.navigate(['/profile'])
+    }, 3000);
   }
 
   logout() {
@@ -69,7 +70,7 @@ export class AuthService {
     this.router.navigate(['/'])
   }
 
-  get isLogin() {
+  get isLoggedIn() {
     return this.currentUserSub$.value;
   }
 }
